@@ -1,6 +1,35 @@
-//profile-title: base64:8J+XvUnhka3hkK808JOEgvCThoM=
-//profile-update-interval: 24
-//subscription-userinfo: upload=53; download=54; total=955630223360; expire=1749704832
+export default {
+  async fetch(request) {
+    const now = Math.floor(Date.now() / 1000);
+
+    // تنظیمات مصرف
+    const upload = 53;
+    const download = 54;
+    const total = 955630223360; // در بایت
+    const expire = 1749704832;  // یونیکس تایم
+
+    // شرط برای قطع کامل
+    if (upload + download >= total || now >= expire) {
+      return new Response("اشتراک شما منقضی شده یا حجم تمام شده است.", {
+        status: 403,
+        headers: {
+          'content-type': 'text/plain',
+        }
+      });
+    }
+
+    // در غیر این صورت، کانفیگ ارسال شود
+    const config = `your_base64_encoded_config_here==`;
+
+    return new Response(atob(config), {
+      headers: {
+        'content-type': 'application/octet-stream',
+        'subscription-userinfo': `upload=${upload}; download=${download}; total=${total}; expire=${expire}`
+      }
+    });
+  }
+}
+
 {
   "log": {
     "disabled": false,
